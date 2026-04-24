@@ -19,7 +19,7 @@ public class UserAccount {
     private String passwordHash;
 
     @Column(nullable = false)
-    private String status; // e.g., "ACTIVE", "PENDING"
+    private String status; 
     
     // One UserAccount has One StudentProfile
     @OneToOne(mappedBy = "userAccount", cascade = CascadeType.ALL)

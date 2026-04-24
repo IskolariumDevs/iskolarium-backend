@@ -22,4 +22,9 @@ public class ChecklistItem {
     @ManyToOne
     @JoinColumn(name = "tracker_id", referencedColumnName = "trackerId")
     private ApplicationTracker tracker;
+
+    public void setSubmitted(boolean b) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setSubmitted'");
+    }
 }

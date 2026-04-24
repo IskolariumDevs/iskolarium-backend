@@ -15,23 +15,27 @@ public class ApplicationTracker {
     private Long trackerId;
 
     @Column(nullable = false)
-    private String status; // e.g., "IN_PROGRESS", "SUBMITTED"
+    private String status; 
 
-    private Integer progressPercentage; // e.g., 50 for 50%
+    private Integer progressPercentage;
 
     private LocalDate dateStarted;
 
-    // Many trackers can belong to one User Account [cite: 79]
+    
     @ManyToOne
     @JoinColumn(name = "account_id", referencedColumnName = "accountId")
     private UserAccount userAccount;
 
-    // Many trackers can point to one Scholarship [cite: 79]
+    
     @ManyToOne
     @JoinColumn(name = "scholarship_id", referencedColumnName = "scholarshipId")
     private Scholarship scholarship;
 
-    // One Tracker has Many Checklist Items
+
     @OneToMany(mappedBy = "tracker", cascade = CascadeType.ALL)
     private List<ChecklistItem> checklistItems;
-}
+
+    @Column(name = "submission_date")
+    private LocalDate submissionDate;
+    
+    }

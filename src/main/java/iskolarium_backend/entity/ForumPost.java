@@ -29,7 +29,7 @@ public class ForumPost {
     @Column(nullable = false)
     private LocalDateTime timestamp;
 
-    // THE FOREIGN KEY: Links this post back to the UserAccount who wrote it
+    // THE FOREIGN KEY
     @ManyToOne
     @JoinColumn(name = "author_id", referencedColumnName = "accountId")
     private UserAccount author;
