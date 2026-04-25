@@ -40,6 +40,15 @@ public class ApplicationTrackerService {
         Scholarship scholarship = scholarshipRepository.findById(dto.getScholarshipId())
                 .orElseThrow(() -> new RuntimeException("Scholarship not found"));
 
+        // Check if the user is already tracking this scholarship
+        boolean alreadyTracking = trackerRepository.existsByUserAccountAndScholarship(user, scholarship);
+
+if (alreadyTracking) {
+    throw new RuntimeException("Error: You are already tracking this scholarship!");
+}
+
+// If it passes the check, THEN you can create and save the new tracker...
+
         ApplicationTracker tracker = new ApplicationTracker();
         tracker.setUserAccount(user);
         tracker.setScholarship(scholarship);
@@ -61,6 +70,7 @@ public class ApplicationTrackerService {
         
         tracker.setChecklistItems(checklist);
         return trackerRepository.save(tracker);
+        
     }
 
     public List<ApplicationResponseDto> getStudentApplications(Long accountId) {
@@ -105,4 +115,5 @@ public class ApplicationTrackerService {
         item.setIsCompleted(true); // Flips it to true!
         checklistRepository.save(item);
     }
+    
 }
