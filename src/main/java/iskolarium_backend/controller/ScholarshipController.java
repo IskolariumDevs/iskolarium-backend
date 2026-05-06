@@ -53,7 +53,8 @@ public class ScholarshipController {
         List<Scholarship> matches = scholarshipRepository.findRecommended(
             profile.getGwa(), 
             profile.getIncomeBracket(),
-            profile.getCity()
+            profile.getCity(),
+            profile.getStrand()
         );
         
         return ResponseEntity.ok(matches);

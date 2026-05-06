@@ -26,11 +26,15 @@ public class UserAccountService {
 
         // 2. Create the linked Student Profile
         StudentProfile profile = new StudentProfile();
+        profile.setFirstName(dto.getFirstName());
+        profile.setMiddleName(dto.getMiddleName());
+        profile.setLastName(dto.getLastName());
         profile.setGwa(dto.getGwa());
         profile.setUniversity(dto.getUniversity());
         profile.setProgram(dto.getProgram());
         profile.setCity(dto.getCity());
         profile.setIncomeBracket(dto.getIncomeBracket());
+        profile.setStrand(dto.getStrand());
 
         // 3. Link them together
         profile.setUserAccount(account);
@@ -61,11 +65,15 @@ public class UserAccountService {
             response.setStatus(account.getStatus());
 
             if (profile != null) {
+                response.setFirstName(profile.getFirstName());
+                response.setMiddleName(profile.getMiddleName());
+                response.setLastName(profile.getLastName());
                 response.setGwa(profile.getGwa());
                 response.setUniversity(profile.getUniversity());
                 response.setProgram(profile.getProgram());
                 response.setCity(profile.getCity());
                 response.setIncomeBracket(profile.getIncomeBracket());
+                response.setStrand(profile.getStrand());
             }
             return response;
         }

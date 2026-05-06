@@ -16,7 +16,13 @@ public class StudentProfile {
     private String firstName;
 
     @Column
+    private String middleName;
+
+    @Column
     private String lastName;
+
+    @Column
+    private String strand;
 
     @Column(nullable = false)
     private Double gwa;

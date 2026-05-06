@@ -33,4 +33,16 @@ public class MatchCriteria {
     @CollectionTable(name = "criteria_year_levels", joinColumns = @JoinColumn(name = "criteria_id"))
     @Column(name = "year_level")
     private List<String> eligibleYearLevels;
+
+    @ElementCollection
+    @CollectionTable(name = "criteria_strands", joinColumns = @JoinColumn(name = "criteria_id"))
+    @Column(name = "strand")
+    private List<String> eligibleStrands;
+
+    @ElementCollection
+    @CollectionTable(name = "criteria_strands", joinColumns = @JoinColumn(name = "criteria_id"))
+    @Column(name = "strand")
+    private List<String> strands;
+    public List<String> getStrands() { return strands; }
+    public void setStrands(List<String> strands) { this.strands = strands; }
 }
