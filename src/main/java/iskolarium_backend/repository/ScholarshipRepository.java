@@ -12,8 +12,8 @@ import iskolarium_backend.entity.Scholarship;
 @Repository
 public interface ScholarshipRepository extends JpaRepository<Scholarship, Long> {
 @Query("SELECT s FROM Scholarship s JOIN s.matchCriteria c WHERE c.minGwa >= :userGwa " +
-       "AND (s.city = :city OR s.city = 'National' OR s.city IS NULL) " +
-       "AND (s.incomeBracket = :income OR s.incomeBracket = 'All' OR s.incomeBracket IS NULL)")
+       "AND (c.city = :city OR c.city = 'National' OR c.city IS NULL) " +
+       "AND (c.incomeBracket = :income OR c.incomeBracket = 'All' OR c.incomeBracket IS NULL)")
 List<Scholarship> findRecommended(
     @Param("userGwa") Double userGwa,
     @Param("income") String income,
