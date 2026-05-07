@@ -6,12 +6,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class CorsConfig implements WebMvcConfigurer {
-    
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**") // Apply to all endpoints
-                .allowedOrigins("*") // Allow all frontends (change to your Render URL later for security)
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // EXPLICITLY allow the OPTIONS preflight scout!
-                .allowedHeaders("*"); // Allow all headers like Authorization
+        registry.addMapping("/**") // "/**" means apply to ALL endpoints, including /api/applications
+                .allowedOrigins("*")
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // MUST HAVE POST and OPTIONS
+                .allowedHeaders("*");
     }
 }
