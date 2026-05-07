@@ -4,6 +4,8 @@ import iskolarium_backend.security.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -12,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -19,27 +22,33 @@ public class SecurityConfig {
     @Autowired
     private JwtAuthenticationFilter jwtAuthFilter;
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-            .cors(cors -> cors.configure(http))
-            .csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/users/register", "/api/auth/login").permitAll() // 
-                .requestMatchers("/api/scholarships/search").permitAll() // for guests
-                .anyRequest().authenticated() // Everything else requires a login token
-            )
-            // telling spring we are using tokens
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+@Bean
+public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    http
+        .cors(Customizer.withDefaults())
+        .csrf(csrf -> csrf.disable())
+        .authorizeHttpRequests(auth -> auth
+            // 1. ALLOW ALL OPTIONS REQUESTS (This fixes the 403 for POST requests)
+            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() 
             
-            // put our Bouncer (Filter) at the front door
-            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class); 
+            // 2. Allow public access to login/register and searching
+            .requestMatchers("/api/users/register", "/api/users/login").permitAll()
+            .requestMatchers("/api/scholarships/search").permitAll()
+            
+            // 3. Require authentication for everything else
+            .anyRequest().authenticated()
+        )
+        // 4. NEW SYNTAX: Lambda style for Session Management
+        .sessionManagement(session -> session
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        )
+        // 5. CRITICAL: Add your JWT filter so it actually checks the tokens!
+        .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         
-        return http.build();
-    }
-
+    return http.build(); }
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 }
+
