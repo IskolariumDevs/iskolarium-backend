@@ -40,4 +40,21 @@ public class MatchCriteria {
     @CollectionTable(name = "criteria_strands", joinColumns = @JoinColumn(name = "criteria_id"))
     @Column(name = "strand")
     private List<String> eligibleStrands;
+
+    @ElementCollection
+    @CollectionTable(name = "criteria_provinces", joinColumns = @JoinColumn(name = "criteria_id"))
+    @Column(name = "province")
+    private List<String> eligibleProvinces;
+
+    public List<String> getEligibleProvinces() {
+        return eligibleProvinces;
+    }
+
+    public void setEligibleProvinces(List<String> eligibleProvinces) {
+        this.eligibleProvinces = eligibleProvinces;
+    }
+
+
+
+
 }

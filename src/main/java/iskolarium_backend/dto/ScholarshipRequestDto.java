@@ -2,7 +2,7 @@ package iskolarium_backend.dto;
 
 import lombok.Data;
 import java.time.LocalDate;
-import java.util.List; // Add this import!
+import java.util.List; 
 
 @Data
 public class ScholarshipRequestDto {
@@ -13,12 +13,14 @@ public class ScholarshipRequestDto {
     private String applicationLink;
     private LocalDate deadlineDate;
 
-    // Upgraded to Lists!
+    // upgraded to lists
     private List<String> requirements; 
     private List<String> eligibleYearLevels;
+    private List<String> eligibleProvinces;
 
     private Double minGwa;
     private String targetUniversities;
     private String targetPrograms;
     private String eligibleCities;
+
 }
