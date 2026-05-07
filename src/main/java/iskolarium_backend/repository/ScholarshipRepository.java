@@ -14,9 +14,9 @@ public interface ScholarshipRepository extends JpaRepository<Scholarship, Long> 
 
     @Query("SELECT DISTINCT s FROM Scholarship s " +
            "JOIN s.matchCriteria c " +
-           "LEFT JOIN c.strands st " +
+           "LEFT JOIN c.eligibleStrands st " + // <-- Changed to match Line 40
            "WHERE c.minGwa >= :userGwa " +
-           "AND (c.city = :city OR c.city = 'National' OR c.city IS NULL) " +
+           "AND (c.eligibleCities = :city OR c.eligibleCities = 'National' OR c.eligibleCities IS NULL) " + // <-- Changed to match Line 25
            "AND (c.incomeBracket = :income OR c.incomeBracket = 'All' OR c.incomeBracket IS NULL) " +
            "AND (st = :userStrand OR st = 'All' OR st IS NULL)")
     List<Scholarship> findRecommended(
