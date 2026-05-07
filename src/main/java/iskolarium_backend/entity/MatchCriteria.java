@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Data
 @Table(name = "match_criteria")
@@ -29,6 +31,7 @@ public class MatchCriteria {
     // Links this criteria directly to its parent Scholarship
     @OneToOne
     @JoinColumn(name = "scholarship_id", referencedColumnName = "scholarshipId")
+    @JsonIgnore
     private Scholarship scholarship;
 
     @ElementCollection
