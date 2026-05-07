@@ -2,6 +2,7 @@ package iskolarium_backend.controller;
 
 import iskolarium_backend.dto.UserProfileResponseDto;
 import iskolarium_backend.dto.UserRegistrationDto;
+import iskolarium_backend.entity.StudentProfile;
 import iskolarium_backend.service.UserAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -44,6 +45,33 @@ public class UserAccountController {
             // ask the service to find the user
             UserProfileResponseDto profile = userAccountService.getUserProfile(id);
             return ResponseEntity.ok(profile);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // GET endpoint at: http://localhost:8080/api/users/profile?email=user@example.com
+    @GetMapping("/profile")
+    public ResponseEntity<?> getUserProfileByEmail(@RequestParam String email) {
+        try {
+            StudentProfile profile = userAccountService.findByEmail(email);
+            UserProfileResponseDto response = new UserProfileResponseDto();
+            response.setFirstName(profile.getFirstName());
+            response.setMiddleName(profile.getMiddleName());
+            response.setLastName(profile.getLastName());
+            response.setGwa(profile.getGwa());
+            response.setUniversity(profile.getUniversity());
+            response.setProgram(profile.getProgram());
+            response.setCity(profile.getCity());
+            response.setProvince(profile.getProvince());
+            response.setIncomeBracket(profile.getIncomeBracket());
+            response.setStrand(profile.getStrand());
+            response.setEmail(email);
+            if (profile.getUserAccount() != null) {
+                response.setAccountId(profile.getUserAccount().getAccountId());
+                response.setStatus(profile.getUserAccount().getStatus());
+            }
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
