@@ -18,7 +18,6 @@ import iskolarium_backend.repository.ChecklistItemRepository;
 import iskolarium_backend.repository.ScholarshipRepository;
 import iskolarium_backend.repository.UserAccountRepository;
 
-
 @Service
 public class ApplicationTrackerService {
 
@@ -31,23 +30,21 @@ public class ApplicationTrackerService {
     @Autowired
     private ScholarshipRepository scholarshipRepository;
 
+    @Autowired 
+    private ChecklistItemRepository checklistRepository;
 
-
-    public ApplicationTracker submitApplication(ApplicationRequestDto dto) {
-        UserAccount user = userAccountRepository.findById(dto.getAccountId())
+    public ApplicationTracker submitApplication(ApplicationRequestDto dto, String userEmail) {
+        UserAccount user = userAccountRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         Scholarship scholarship = scholarshipRepository.findById(dto.getScholarshipId())
                 .orElseThrow(() -> new RuntimeException("Scholarship not found"));
 
-        // Check if the user is already tracking this scholarship
         boolean alreadyTracking = trackerRepository.existsByUserAccountAndScholarship(user, scholarship);
 
-if (alreadyTracking) {
-    throw new RuntimeException("Error: You are already tracking this scholarship!");
-}
-
-// If it passes the check, THEN you can create and save the new tracker...
+        if (alreadyTracking) {
+            throw new RuntimeException("Error: You are already tracking this scholarship!");
+        }
 
         ApplicationTracker tracker = new ApplicationTracker();
         tracker.setUserAccount(user);
@@ -57,20 +54,18 @@ if (alreadyTracking) {
 
         List<ChecklistItem> checklist = new ArrayList<>();
         
-        // Loop through the DOST requirements (Form E, PSA, etc.)
         if (scholarship.getRequirements() != null) {
             for (String reqName : scholarship.getRequirements()) {
                 ChecklistItem item = new ChecklistItem();
-                item.setRequirementName(reqName); // Perfect match!
-                item.setIsCompleted(false);       // Perfect match!
-                item.setTracker(tracker);         // Links it to the application
+                item.setRequirementName(reqName); 
+                item.setIsCompleted(false);       
+                item.setTracker(tracker);         
                 checklist.add(item);
             }
         }
         
         tracker.setChecklistItems(checklist);
         return trackerRepository.save(tracker);
-        
     }
 
     public List<ApplicationResponseDto> getStudentApplications(Long accountId) {
@@ -84,36 +79,30 @@ if (alreadyTracking) {
             dto.setProvider(tracker.getScholarship().getProvider());
             dto.setStatus(tracker.getStatus());
             dto.setSubmissionDate(tracker.getSubmissionDate());
-            
             responseList.add(dto);
         }
-
         return responseList;
     }
-    public List<ApplicationResponseDto> getStudentApplications1(Long accountId) {
-        List<ApplicationTracker> trackers = trackerRepository.findByUserAccount_AccountId(accountId);
-        List<ApplicationResponseDto> responseList = new ArrayList<>();
 
-        for (ApplicationTracker tracker : trackers) {
-            ApplicationResponseDto dto = new ApplicationResponseDto();
-            dto.setTrackerId(tracker.getTrackerId());
-            dto.setScholarshipTitle(tracker.getScholarship().getTitle());
-            dto.setProvider(tracker.getScholarship().getProvider());
-            dto.setStatus(tracker.getStatus());
-            dto.setSubmissionDate(tracker.getSubmissionDate()); // or getApplicationDate() depending on what you named it!
-            
-            responseList.add(dto);
-        }
-
-        return responseList;
+    public List<ApplicationResponseDto> getStudentApplicationsByEmail(String email) {
+        UserAccount user = userAccountRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return getStudentApplications(user.getAccountId());
     }
-    @Autowired private ChecklistItemRepository checklistRepository;
+
     public void markChecklistItemSubmitted(Long checklistItemId) {
         ChecklistItem item = checklistRepository.findById(checklistItemId)
                 .orElseThrow(() -> new RuntimeException("Checklist item not found"));
         
-        item.setIsCompleted(true); // Flips it to true!
+        item.setIsCompleted(true);
         checklistRepository.save(item);
     }
-    
+
+    // FIXED: Using trackerRepository and fixed the curly brace structure
+    public void deleteApplication(Long id) {
+        if (!trackerRepository.existsById(id)) {
+            throw new RuntimeException("Application record not found.");
+        }
+        trackerRepository.deleteById(id);
+    }
 }

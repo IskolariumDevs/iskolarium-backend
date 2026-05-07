@@ -12,7 +12,9 @@ public class Scholarship {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private Long scholarshipId;
+    private String requirement;
 
     @Column(nullable = false)
     private String title;

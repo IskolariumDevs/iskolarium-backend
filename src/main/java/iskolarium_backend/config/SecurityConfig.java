@@ -32,7 +32,7 @@ public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
             .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() 
             
             // 2. Allow public access to login/register and searching
-            .requestMatchers("/api/users/register", "/api/users/login").permitAll()
+            .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
             .requestMatchers("/api/scholarships/search").permitAll()
             
             // 3. Require authentication for everything else

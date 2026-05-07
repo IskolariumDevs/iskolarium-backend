@@ -1,10 +1,12 @@
 package iskolarium_backend.controller;
 
+import java.security.Principal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,9 +29,10 @@ public class ApplicationTrackerController {
 
     // POST endpoint at: http://localhost:8080/api/applications/apply
     @PostMapping("/apply")
-    public ResponseEntity<String> applyForScholarship(@RequestBody ApplicationRequestDto dto) {
+    public ResponseEntity<String> applyForScholarship(@RequestBody ApplicationRequestDto dto, Principal principal) {
         try {
-            trackerService.submitApplication(dto);
+            String userEmail = principal.getName();
+            trackerService.submitApplication(dto, userEmail);
             return ResponseEntity.ok("Successfully applied! Your application is now PENDING.");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error submitting application: " + e.getMessage());
@@ -37,11 +40,12 @@ public class ApplicationTrackerController {
     }
     
 
-    // GET endpoint at: http://localhost:8080/api/applications/user/1
-    @GetMapping("/user/{accountId}")
-    public ResponseEntity<?> getUserApplications(@PathVariable Long accountId) {
+    // GET endpoint at: http://localhost:8080/api/applications
+    @GetMapping
+    public ResponseEntity<?> getUserApplications(Principal principal) {
         try {
-            List<ApplicationResponseDto> applications = trackerService.getStudentApplications(accountId);
+            String userEmail = principal.getName();
+            List<ApplicationResponseDto> applications = trackerService.getStudentApplicationsByEmail(userEmail);
             
             if (applications.isEmpty()) {
                 return ResponseEntity.ok("You haven't applied to any scholarships yet.");
@@ -51,7 +55,6 @@ public class ApplicationTrackerController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error fetching applications: " + e.getMessage());
         }
-        
     }
     // PUT endpoint at: http://localhost:8080/api/applications/checklist/5/check
     @PutMapping("/checklist/{itemId}/check")
@@ -61,6 +64,15 @@ public class ApplicationTrackerController {
             return ResponseEntity.ok("Requirement marked as submitted!");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error updating checklist: " + e.getMessage());
+        }
+    }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteApplication(@PathVariable Long id) {
+        try {
+            trackerService.deleteApplication(id);
+            return ResponseEntity.ok("Scholarship removed from dashboard.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         }
     }
 }
