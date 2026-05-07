@@ -36,7 +36,7 @@ public class StudentProfile {
     @Column(nullable = false)
     private String city;
 
-    @Column
+    @Column(name = "province")
     private String province;
 
     @Column(nullable = false)

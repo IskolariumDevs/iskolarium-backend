@@ -29,14 +29,13 @@ public interface ScholarshipRepository extends JpaRepository<Scholarship, Long> 
 
     @Query("SELECT DISTINCT s FROM Scholarship s " +
            "JOIN s.matchCriteria c " +
-           "LEFT JOIN c.eligibleStrands st " +
            "WHERE (:gwa IS NULL OR c.minGwa >= :gwa) " +
-           "AND (:program IS NULL OR :program = '' OR c.targetPrograms IS NULL OR c.targetPrograms = 'All' OR c.targetPrograms LIKE CONCAT('%', :program, '%')) " +
-           "AND (:university IS NULL OR :university = '' OR c.targetUniversities IS NULL OR c.targetUniversities = 'All' OR c.targetUniversities LIKE CONCAT('%', :university, '%')) " +
-           "AND (:city IS NULL OR :city = '' OR c.eligibleCities IS NULL OR c.eligibleCities = 'All' OR c.eligibleCities LIKE CONCAT('%', :city, '%')) " +
-           "AND (:province IS NULL OR :province = '' OR c.eligibleProvinces IS NULL OR c.eligibleProvinces = 'All' OR c.eligibleProvinces LIKE CONCAT('%', :province, '%')) " +
-           "AND (:incomeBracket IS NULL OR :incomeBracket = '' OR c.incomeBrackets IS NULL OR c.incomeBrackets = 'All' OR c.incomeBrackets LIKE CONCAT('%', :incomeBracket, '%')) " +
-           "AND (:strand IS NULL OR :strand = '' OR st IS NULL OR st = 'All' OR st = :strand)")
+           "AND (:program IS NULL OR :program = '' OR c.targetPrograms IS EMPTY OR 'All' MEMBER OF c.targetPrograms OR :program MEMBER OF c.targetPrograms) " +
+           "AND (:university IS NULL OR :university = '' OR c.targetUniversities IS EMPTY OR 'All' MEMBER OF c.targetUniversities OR :university MEMBER OF c.targetUniversities) " +
+           "AND (:city IS NULL OR :city = '' OR c.eligibleCities IS EMPTY OR 'All' MEMBER OF c.eligibleCities OR :city MEMBER OF c.eligibleCities) " +
+           "AND (:province IS NULL OR :province = '' OR c.eligibleProvinces IS EMPTY OR 'All' MEMBER OF c.eligibleProvinces OR :province MEMBER OF c.eligibleProvinces) " +
+           "AND (:incomeBracket IS NULL OR :incomeBracket = '' OR c.incomeBrackets IS EMPTY OR 'All' MEMBER OF c.incomeBrackets OR :incomeBracket MEMBER OF c.incomeBrackets) " +
+           "AND (:strand IS NULL OR :strand = '' OR c.eligibleStrands IS EMPTY OR 'All' MEMBER OF c.eligibleStrands OR :strand MEMBER OF c.eligibleStrands)")
     List<Scholarship> findByFilters(
         @Param("gwa") Double gwa,
         @Param("program") String program,
@@ -44,5 +43,6 @@ public interface ScholarshipRepository extends JpaRepository<Scholarship, Long> 
         @Param("city") String city,
         @Param("province") String province,
         @Param("incomeBracket") String incomeBracket,
-        @Param("strand") String strand);
+        @Param("strand") String strand
+    );
 }
