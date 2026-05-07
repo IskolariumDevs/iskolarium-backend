@@ -59,4 +59,21 @@ public class ScholarshipController {
         
         return ResponseEntity.ok(matches);
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<Scholarship>> searchScholarships(
+            @RequestParam(required = false) Double gwa,
+            @RequestParam(required = false) String program,
+            @RequestParam(required = false) String university,
+            @RequestParam(required = false) String city,
+            @RequestParam(required = false) String province,
+            @RequestParam(required = false) String incomeBracket,
+            @RequestParam(required = false) String strand) {
+        
+        List<Scholarship> matches = scholarshipRepository.findByFilters(
+            gwa, program, university, city, province, incomeBracket, strand
+        );
+        
+        return ResponseEntity.ok(matches);
+    }
 }

@@ -16,6 +16,7 @@ public class UserProfileResponseDto {
     private String university;
     private String program;
     private String city;
+    private String province;
     private String incomeBracket;
     private String strand;
 }

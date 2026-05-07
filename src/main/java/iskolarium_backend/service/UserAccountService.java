@@ -33,6 +33,7 @@ public class UserAccountService {
         profile.setUniversity(dto.getUniversity());
         profile.setProgram(dto.getProgram());
         profile.setCity(dto.getCity());
+        profile.setProvince(dto.getProvince());
         profile.setIncomeBracket(dto.getIncomeBracket());
         profile.setStrand(dto.getStrand());
 
@@ -72,6 +73,7 @@ public class UserAccountService {
                 response.setUniversity(profile.getUniversity());
                 response.setProgram(profile.getProgram());
                 response.setCity(profile.getCity());
+                response.setProvince(profile.getProvince());
                 response.setIncomeBracket(profile.getIncomeBracket());
                 response.setStrand(profile.getStrand());
             }

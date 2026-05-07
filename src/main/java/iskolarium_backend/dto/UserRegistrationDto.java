@@ -17,6 +17,7 @@ public class UserRegistrationDto {
     private String university;
     private String program;
     private String city;
+    private String province;
     private String incomeBracket;
     private String strand; // For incoming freshmen
 }

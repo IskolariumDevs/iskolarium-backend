@@ -25,16 +25,14 @@ public class SecurityConfig {
             .cors(cors -> cors.configure(http))
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                // THE LOBBY: Anyone can access Login and Register
-                .requestMatchers("/api/auth/**", "/api/users/register").permitAll() 
-                
-                // THE VAULT: Everything else requires a valid Keycard!
-                .anyRequest().authenticated() 
+                .requestMatchers("/api/users/register", "/api/auth/login").permitAll() // 
+                .requestMatchers("/api/scholarships/search").permitAll() // for guests
+                .anyRequest().authenticated() // Everything else requires a login token
             )
-            // Tell Spring we are using tokens, not sessions
+            // telling spring we are using tokens
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             
-            // Put our Bouncer (Filter) at the front door!
+            // put our Bouncer (Filter) at the front door
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class); 
         
         return http.build();

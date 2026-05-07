@@ -36,6 +36,9 @@ public class StudentProfile {
     @Column(nullable = false)
     private String city;
 
+    @Column
+    private String province;
+
     @Column(nullable = false)
     private String incomeBracket;
 
