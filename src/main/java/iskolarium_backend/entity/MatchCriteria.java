@@ -24,6 +24,8 @@ public class MatchCriteria {
     
     private String eligibleCities;
 
+    private String incomeBracket;
+
     // Links this criteria directly to its parent Scholarship
     @OneToOne
     @JoinColumn(name = "scholarship_id", referencedColumnName = "scholarshipId")
@@ -38,11 +40,4 @@ public class MatchCriteria {
     @CollectionTable(name = "criteria_strands", joinColumns = @JoinColumn(name = "criteria_id"))
     @Column(name = "strand")
     private List<String> eligibleStrands;
-
-    @ElementCollection
-    @CollectionTable(name = "criteria_strands", joinColumns = @JoinColumn(name = "criteria_id"))
-    @Column(name = "strand")
-    private List<String> strands;
-    public List<String> getStrands() { return strands; }
-    public void setStrands(List<String> strands) { this.strands = strands; }
 }

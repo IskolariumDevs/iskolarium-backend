@@ -21,7 +21,7 @@ import iskolarium_backend.service.UserAccountService;
 
 @RestController
 @RequestMapping("/api/scholarships")
-@CrossOrigin(origins = "http://127.0.0.1:3000")
+@CrossOrigin(origins = "*")
 
 public class ScholarshipController {
 
@@ -51,9 +51,9 @@ public class ScholarshipController {
         StudentProfile profile = userAccountService.findByEmail(email);
         
         List<Scholarship> matches = scholarshipRepository.findRecommended(
-            profile.getGwa(), 
-            profile.getIncomeBracket(),
+            profile.getGwa(),
             profile.getCity(),
+            profile.getUniversity(),
             profile.getStrand()
         );
         
