@@ -1,6 +1,7 @@
 package iskolarium_backend.controller;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import iskolarium_backend.dto.ApplicationRequestDto;
@@ -47,8 +49,8 @@ public class ApplicationTrackerController {
             String userEmail = principal.getName();
             List<ApplicationResponseDto> applications = trackerService.getStudentApplicationsByEmail(userEmail);
             
-            if (applications.isEmpty()) {
-                return ResponseEntity.ok("You haven't applied to any scholarships yet.");
+           if (applications.isEmpty()) {
+                return ResponseEntity.ok(new ArrayList<>()); // Returns [] which JS loves
             }
             
             return ResponseEntity.ok(applications);
@@ -57,13 +59,13 @@ public class ApplicationTrackerController {
         }
     }
     // PUT endpoint at: http://localhost:8080/api/applications/checklist/5/check
-    @PutMapping("/checklist/{itemId}/check")
-    public ResponseEntity<String> checkOffRequirement(@PathVariable Long itemId) {
+    @PutMapping("/checklist/{itemId}")
+    public ResponseEntity<?> updateChecklistStatus(@PathVariable Long itemId, @RequestParam boolean completed) {
         try {
-            trackerService.markChecklistItemSubmitted(itemId);
-            return ResponseEntity.ok("Requirement marked as submitted!");
+            trackerService.updateChecklistItemStatus(itemId, completed);
+            return ResponseEntity.ok("Status updated successfully");
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error updating checklist: " + e.getMessage());
+            return ResponseEntity.badRequest().body("Error updating item: " + e.getMessage());
         }
     }
     @DeleteMapping("/{id}")

@@ -35,10 +35,8 @@ public class ChecklistItem {
     private ApplicationTracker tracker;
 
     public void setSubmitted(boolean b) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setSubmitted'");
+        this.isCompleted = b;
     }
-    @OneToMany(mappedBy = "tracker", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ChecklistItem> checklistItems;
+
 
 }

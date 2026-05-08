@@ -27,15 +27,15 @@ public class ApplicationTracker {
     private UserAccount userAccount;
 
     
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "scholarship_id", referencedColumnName = "scholarshipId")
     private Scholarship scholarship;
 
 
-    @OneToMany(mappedBy = "tracker", cascade = CascadeType.ALL)
-    private List<ChecklistItem> checklistItems;
-
     @Column(name = "submission_date")
     private LocalDate submissionDate;
+
+    @OneToMany(mappedBy = "tracker", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ChecklistItem> checklistItems;
     
     }

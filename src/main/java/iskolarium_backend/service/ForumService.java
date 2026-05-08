@@ -31,14 +31,14 @@ public class ForumService {
 
     // --- 1. METHOD TO CREATE A POST ---
     public ForumPost createPost(ForumPostRequestDto dto) {
-        UserAccount postAuthor = userAccountRepository.findById(dto.getAccountId())
+        UserAccount postAuthor = userAccountRepository.findByEmail(dto.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         ForumPost post = new ForumPost();
         post.setAuthor(postAuthor);               // Perfectly matches your 'author' variable
         post.setTextContent(dto.getTextContent());// Perfectly matches your 'textContent' variable
         post.setTimestamp(LocalDateTime.now());   // Perfectly matches your 'timestamp' variable
-        post.setIsAnonymous(dto.getIsAnonymous());// From your new DTO
+        post.setIsAnonymous(dto.isAnonymous());   // From your new DTO
         
         // Setting your default values just to be safe
         post.setUpvoteCount(0);
