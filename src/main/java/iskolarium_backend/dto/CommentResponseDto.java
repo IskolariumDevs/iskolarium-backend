@@ -8,5 +8,6 @@ public class CommentResponseDto {
     private Long commentId;
     private String textContent;
     private String authorName;
+    private Long authorId;
     private LocalDateTime timestamp;
 }

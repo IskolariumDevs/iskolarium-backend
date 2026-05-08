@@ -23,8 +23,6 @@ public class ForumPost {
     @Column(nullable = false)
     private Boolean isAnonymous;
 
-    @Column(nullable = false)
-    private Boolean isResolved = false; // Default to not resolved
 
     @Column(nullable = false)
     private LocalDateTime timestamp;
@@ -33,4 +31,17 @@ public class ForumPost {
     @ManyToOne
     @JoinColumn(name = "author_id", referencedColumnName = "accountId")
     private UserAccount author;
+
+    @Column(name = "is_resolved", nullable = false, columnDefinition = "boolean default false")
+    private boolean isResolved = false;
+
+    // Setter for the resolved status
+    public void setResolved(boolean resolved) {
+        this.isResolved = resolved;
+    }
+    // Getter for the resolved status
+    public boolean isResolved() {
+        return this.isResolved;
+    }
+    
 }

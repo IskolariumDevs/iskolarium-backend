@@ -4,11 +4,15 @@ import iskolarium_backend.dto.CommentRequestDto;
 import iskolarium_backend.dto.CommentResponseDto;
 import iskolarium_backend.dto.ForumPostRequestDto;
 import iskolarium_backend.dto.ForumPostResponseDto;
-import iskolarium_backend.entity.Comment;
+import iskolarium_backend.entity.ForumPost;
+import iskolarium_backend.repository.ForumPostRepository;
 import iskolarium_backend.service.ForumService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -48,17 +52,7 @@ public class ForumController {
             return ResponseEntity.badRequest().body("Error fetching posts: " + e.getMessage());
         }
     }
-    // Endpoint to upvote
-    // PUT request to: http://localhost:8080/api/forum/posts/1/upvote
-    @PutMapping("/posts/{postId}/upvote")
-    public ResponseEntity<String> upvotePost(@PathVariable Long postId) {
-        try {
-            forumService.upvotePost(postId);
-            return ResponseEntity.ok("Post upvoted successfully!");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error upvoting: " + e.getMessage());
-        }
-    }
+
     // Endpoint to add comment
     // POST request to: http://localhost:8080/api/forum/posts/1/comments
     @PostMapping("/posts/{postId}/comments")
@@ -89,13 +83,19 @@ public class ForumController {
     }
     // endpoint to mark as resolved
     // PUT request to: http://localhost:8080/api/forum/posts/1/resolve?accountId=1
-    @PutMapping("/posts/{postId}/resolve")
-    public ResponseEntity<String> resolvePost(@PathVariable Long postId, @RequestParam Long accountId) {
-        try {
-            forumService.markPostAsResolved(postId, accountId);
-            return ResponseEntity.ok("Success! This forum thread is now marked as resolved.");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+    @Autowired
+    private ForumPostRepository forumPostRepository;
+    @PutMapping("/{postId}/resolve")
+    public ResponseEntity<?> resolvePost(@PathVariable Long postId, @RequestParam Long accountId) {
+        ForumPost post = forumPostRepository.findById(postId).orElseThrow();
+        
+        // Optional Security: Verify the person clicking is actually the author
+        if (!post.getAuthor().getAccountId().equals(accountId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Only the author can resolve this post.");
         }
+        
+        post.setResolved(true);
+        forumPostRepository.save(post); // CRITICAL: Save the change to the DB
+        return ResponseEntity.ok("Post resolved");
     }
 }

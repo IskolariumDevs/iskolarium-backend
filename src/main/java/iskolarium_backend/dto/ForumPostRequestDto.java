@@ -6,5 +6,4 @@ import lombok.Data;
 public class ForumPostRequestDto {
     private String email;
     private String textContent;
-    private boolean isAnonymous;
 }

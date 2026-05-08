@@ -38,11 +38,11 @@ public class ForumService {
         post.setAuthor(postAuthor);               // Perfectly matches your 'author' variable
         post.setTextContent(dto.getTextContent());// Perfectly matches your 'textContent' variable
         post.setTimestamp(LocalDateTime.now());   // Perfectly matches your 'timestamp' variable
-        post.setIsAnonymous(dto.isAnonymous());   // From your new DTO
         
         // Setting your default values just to be safe
         post.setUpvoteCount(0);
-        post.setIsResolved(false);
+        post.setResolved(false);
+        
 
         return forumPostRepository.save(post);
     }
@@ -57,6 +57,9 @@ public class ForumService {
             dto.setPostId(post.getPostId());
             dto.setTextContent(post.getTextContent());
             dto.setTimestamp(post.getTimestamp()); 
+            dto.setIsResolved(post.isResolved());
+            dto.setAuthorEmail(post.getAuthor().getEmail());
+            dto.setAuthorId(post.getAuthor().getAccountId());
             
             // Checks if anonymous before revealing the name!
             if (post.getIsAnonymous() != null && post.getIsAnonymous()) {
@@ -67,15 +70,6 @@ public class ForumService {
             
             return dto;
         }).collect(Collectors.toList());  
-    }
-    // To upvote a post
-    public void upvotePost(Long postId) {
-        ForumPost post = forumPostRepository.findById(postId)
-                .orElseThrow(() -> new RuntimeException("Post not found"));
-        
-        // Add 1 to the current score
-        post.setUpvoteCount(post.getUpvoteCount() + 1);
-        forumPostRepository.save(post);
     }
     // to comment
     
@@ -107,6 +101,7 @@ public class ForumService {
             dto.setCommentId(comment.getCommentId());
             dto.setTextContent(comment.getTextContent());
             dto.setTimestamp(comment.getTimestamp());
+            dto.setAuthorId(comment.getAuthor().getAccountId());
             
             // Safely extract just the name string, leaving the raw entities behind
             dto.setAuthorName(comment.getAuthor().getStudentProfile().getFirstName() + " " + comment.getAuthor().getStudentProfile().getLastName());
@@ -125,7 +120,7 @@ public class ForumService {
             throw new RuntimeException("Unauthorized: You can only resolve your own posts.");
         }
         
-        post.setIsResolved(true);
+        post.setResolved(true);
         forumPostRepository.save(post);
     }
 }

@@ -8,6 +8,8 @@ import iskolarium_backend.repository.UserAccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.Optional;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserAccountService {
@@ -81,5 +83,30 @@ public class UserAccountService {
         }
         
         throw new RuntimeException("User not found with ID: " + accountId);
+    }
+    
+    public List<UserProfileResponseDto> searchUsers(String query) {
+        List<UserAccount> allUsers = userAccountRepository.findAll();
+        String lowerQuery = query.toLowerCase();
+        
+        return allUsers.stream()
+            .filter(account -> {
+                StudentProfile profile = account.getStudentProfile();
+                if (profile == null) return false;
+                String fullName = (profile.getFirstName() + " " + profile.getLastName()).toLowerCase();
+                return fullName.contains(lowerQuery) || account.getEmail().toLowerCase().contains(lowerQuery);
+            })
+            .map(account -> {
+                UserProfileResponseDto dto = new UserProfileResponseDto();
+                dto.setAccountId(account.getAccountId());
+                dto.setEmail(account.getEmail());
+                StudentProfile profile = account.getStudentProfile();
+                if (profile != null) {
+                    dto.setFirstName(profile.getFirstName());
+                    dto.setLastName(profile.getLastName());
+                }
+                return dto;
+            })
+            .collect(Collectors.toList());
     }
 }
