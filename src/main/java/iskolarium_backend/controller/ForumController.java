@@ -85,17 +85,24 @@ public class ForumController {
     // PUT request to: http://localhost:8080/api/forum/posts/1/resolve?accountId=1
     @Autowired
     private ForumPostRepository forumPostRepository;
-    @PutMapping("/{postId}/resolve")
+    
+    @PutMapping("/posts/{postId}/resolve")
     public ResponseEntity<?> resolvePost(@PathVariable Long postId, @RequestParam Long accountId) {
-        ForumPost post = forumPostRepository.findById(postId).orElseThrow();
-        
-        // Optional Security: Verify the person clicking is actually the author
-        if (!post.getAuthor().getAccountId().equals(accountId)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Only the author can resolve this post.");
+        try {
+            ForumPost post = forumPostRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+            
+            // Security: Verify the person clicking is actually the author
+            if (!post.getAuthor().getAccountId().equals(accountId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Only the author can resolve this post.");
+            }
+            
+            post.setResolved(true);
+            forumPostRepository.save(post);
+            return ResponseEntity.ok("Post marked as resolved");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         }
-        
-        post.setResolved(true);
-        forumPostRepository.save(post); // CRITICAL: Save the change to the DB
-        return ResponseEntity.ok("Post resolved");
     }
 }

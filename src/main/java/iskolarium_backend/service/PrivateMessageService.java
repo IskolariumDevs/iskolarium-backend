@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,11 +32,15 @@ public class PrivateMessageService {
         message.setSender(sender);
         message.setReceiver(receiver);
         message.setContent(dto.getContent());
-        message.setIsAnonymous(dto.getIsAnonymous());
+        
+        // 🚨 FIX 1: Safely default to false since the checkbox is gone
+        message.setIsAnonymous(dto.getIsAnonymous() != null ? dto.getIsAnonymous() : false);
+        
         message.setTimestamp(LocalDateTime.now());
 
         messageRepository.save(message);
     }
+    
 
     // get conversation thread
     // 'viewerId' is the person looking at their screen
@@ -53,8 +57,8 @@ public class PrivateMessageService {
             boolean isSender = msg.getSender().getAccountId().equals(viewerId);
             dto.setIsYours(isSender);
 
-            // anonymoty check
-            if (msg.getIsAnonymous() && !isSender) {
+            // 🚨 FIX 2: Use Boolean.TRUE.equals() to prevent NullPointerExceptions!
+            if (Boolean.TRUE.equals(msg.getIsAnonymous()) && !isSender) {
                 // if anonymous and you didn't send it, mask the name
                 dto.setSenderName("Anonymous Student");
             } else {
@@ -64,5 +68,49 @@ public class PrivateMessageService {
 
             return dto;
         }).collect(Collectors.toList());
+    }
+    
+    // get list of conversations for a user
+    public List<Map<String, Object>> getConversationsList(Long userId) {
+        List<PrivateMessage> allMessages = messageRepository.findAll();
+        
+        // Find unique conversation partners
+        Set<Long> conversationPartners = new HashSet<>();
+        for (PrivateMessage msg : allMessages) {
+            if (msg.getSender().getAccountId().equals(userId)) {
+                conversationPartners.add(msg.getReceiver().getAccountId());
+            } else if (msg.getReceiver().getAccountId().equals(userId)) {
+                conversationPartners.add(msg.getSender().getAccountId());
+            }
+        }
+        
+        List<Map<String, Object>> conversations = new ArrayList<>();
+        for (Long partnerId : conversationPartners) {
+            UserAccount partner = userAccountRepository.findById(partnerId).orElse(null);
+            if (partner == null) continue;
+            
+            // Get last message
+            List<PrivateMessage> thread = messageRepository.findConversationThread(userId, partnerId);
+            if (thread.isEmpty()) continue;
+            
+            PrivateMessage lastMsg = thread.get(thread.size() - 1);
+            
+            Map<String, Object> conv = new HashMap<>();
+            conv.put("otherUserId", partnerId);
+            conv.put("otherUserName", partner.getStudentProfile().getFirstName() + " " + partner.getStudentProfile().getLastName());
+            conv.put("lastMessage", lastMsg.getContent());
+            conv.put("timestamp", lastMsg.getTimestamp());
+            
+            conversations.add(conv);
+        }
+        
+        // Sort by timestamp descending
+        conversations.sort((a, b) -> {
+            LocalDateTime timeA = (LocalDateTime) a.get("timestamp");
+            LocalDateTime timeB = (LocalDateTime) b.get("timestamp");
+            return timeB.compareTo(timeA);
+        });
+        
+        return conversations;
     }
 }
